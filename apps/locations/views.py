@@ -59,7 +59,8 @@ class LocationViewSet(ModelViewSet):
 
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def export(self, request):
-        fmt = request.query_params.get("format", "json")
+        # Use export_format instead of format to avoid DRF format suffix conflicts
+        fmt = request.query_params.get("export_format", "json")
         locations = self.filter_queryset(self.get_queryset())
         serializer = LocationSerializer(locations, many=True)
         data = serializer.data
