@@ -1,5 +1,7 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -13,6 +15,7 @@ from apps.users.serializers import (
 )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
 
@@ -24,6 +27,7 @@ class RegisterView(APIView):
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
     permission_classes = (AllowAny,)
 
@@ -35,6 +39,7 @@ class LoginView(APIView):
         return Response(UserSerializer(user).data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -43,6 +48,7 @@ class LogoutView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class MeView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -56,6 +62,7 @@ class MeView(APIView):
         return Response(serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ChangePasswordView(APIView):
     permission_classes = (IsAuthenticated,)
 

@@ -1,3 +1,8 @@
-from django.urls import path
+from rest_framework.routers import SimpleRouter
 
-urlpatterns = []
+from .views import ReviewViewSet
+
+router = SimpleRouter()
+router.register("", ReviewViewSet, basename="review")
+
+urlpatterns = router.urls
