@@ -8,6 +8,8 @@ from django.contrib.auth.views import (
 
 from apps.users.views import ChangePasswordView, LoginView, LogoutView, MeView, RegisterView
 
+app_name = "users"
+
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
     path("login/", LoginView.as_view(), name="login"),

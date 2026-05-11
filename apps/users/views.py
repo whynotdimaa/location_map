@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework.views import APIView
 
 from apps.users.serializers import (
@@ -15,9 +16,14 @@ from apps.users.serializers import (
 )
 
 
+class AuthRateThrottle(AnonRateThrottle):
+    rate = "5/minute"
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
+    throttle_classes = [AuthRateThrottle]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -30,6 +36,7 @@ class RegisterView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginView(APIView):
     permission_classes = (AllowAny,)
+    throttle_classes = [AuthRateThrottle]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -65,6 +72,7 @@ class MeView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class ChangePasswordView(APIView):
     permission_classes = (IsAuthenticated,)
+    throttle_classes = [AuthRateThrottle]
 
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data, context={"request": request})

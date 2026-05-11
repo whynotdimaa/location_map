@@ -82,6 +82,7 @@ CACHES = {
         }
     } if os.environ.get("REDIS_URL") else {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
     }
 }
 
@@ -109,12 +110,25 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",           # Неавторизовані: 100 запитів/годину
+        "user": "1000/hour",          # Авторизовані: 1000 запитів/годину
+        "auth": "5/minute",           # Реєстрація/логін: 5 спроб/хвилину
+        "review": "10/hour",          # Створення відгуків: 10/годину
+        "vote": "60/hour",            # Голосування: 60/годину
+        "subscribe": "30/hour",       # Підписки: 30/годину
+        "export": "5/hour",           # Експорт даних: 5/годину
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+
 }
 
-# CSRF exemption for API endpoints (для Postman)
 CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
 SPECTACULAR_SETTINGS = {

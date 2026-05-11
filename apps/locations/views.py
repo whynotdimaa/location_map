@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.viewsets import ModelViewSet
 
 from .filters import LocationFilter
@@ -16,6 +17,10 @@ from .serializers import LocationListSerializer, LocationSerializer
 
 LOCATIONS_CACHE_KEY = "locations:list"
 LOCATION_CACHE_TTL = 60 * 15  # 15 minutes
+
+
+class ExportThrottle(UserRateThrottle):
+    rate = "5/hour"
 
 
 class LocationViewSet(ModelViewSet):
@@ -57,7 +62,7 @@ class LocationViewSet(ModelViewSet):
 
         return response
 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], throttle_classes=[ExportThrottle])
     def export(self, request):
         # Use export_format instead of format to avoid DRF format suffix conflicts
         fmt = request.query_params.get("export_format", "json")

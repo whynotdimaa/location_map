@@ -2,11 +2,20 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Review, ReviewLike
 from .serializers import ReviewLikeSerializer, ReviewSerializer
 from .tasks import notify_subscribers_on_new_review
+
+
+class ReviewCreateThrottle(UserRateThrottle):
+    rate = "10/hour"
+
+
+class VoteThrottle(UserRateThrottle):
+    rate = "60/hour"
 
 
 class ReviewViewSet(ModelViewSet):
@@ -16,6 +25,13 @@ class ReviewViewSet(ModelViewSet):
     filterset_fields = ("location",)
     ordering_fields = ("created_at", "rating")
     ordering = ("-created_at",)
+
+    def get_throttles(self):
+        if self.action == "create":
+            return [ReviewCreateThrottle()]
+        elif self.action == "vote":
+            return [VoteThrottle()]
+        return super().get_throttles()
 
     def perform_create(self, serializer):
         review = serializer.save(user=self.request.user)
