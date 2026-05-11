@@ -62,13 +62,25 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql" if os.environ.get("DB_HOST") else "django.db.backends.sqlite3",
+        "NAME": os.environ.get("DB_NAME", BASE_DIR / "db.sqlite3"),
+        "USER": os.environ.get("DB_USER", ""),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "HOST": os.environ.get("DB_HOST", ""),
+        "PORT": os.environ.get("DB_PORT", "5432"),
     }
 }
 
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/1")
+
 CACHES = {
     "default": {
+        "BACKEND": "django_redis.cache.RedisCache" if os.environ.get("REDIS_URL") else "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    } if os.environ.get("REDIS_URL") else {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }

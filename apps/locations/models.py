@@ -20,6 +20,7 @@ class Location(models.Model):
     category = models.CharField(max_length=50, choices=Category.choices, default=Category.OTHER)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    address = models.CharField(max_length=500, blank=True)
     avg_rating = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
